@@ -9,9 +9,9 @@ require (
 	github.com/coreos/license-bill-of-materials v0.0.0-20190913234955-13baff47494e
 	github.com/go-openapi/loads v0.20.0 // indirect
 	github.com/go-openapi/spec v0.20.1 // indirect
-	github.com/gogo/protobuf v1.3.1
+	github.com/gogo/protobuf v1.3.2
 	github.com/gordonklaus/ineffassign v0.0.0-20200809085317-e36bfde3bb78
-	github.com/grpc-ecosystem/grpc-gateway v1.14.6
+	github.com/grpc-ecosystem/grpc-gateway v1.16.0
 	github.com/gyuho/gocovmerge v0.0.0-20171205171859-50c7e6afd535
 	github.com/hexfusion/schwag v0.0.0-20170606222847-b7d0fc9aadaa
 	github.com/mdempsky/unconvert v0.0.0-20200228143138-95ecdbfc0b5f
