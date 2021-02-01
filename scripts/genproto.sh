@@ -69,14 +69,14 @@ for pb in api/etcdserverpb/rpc server/etcdserver/api/v3lock/v3lockpb/v3lock serv
   pkg=$(basename "${pkgpath}")
   gwfile="${pb}.pb.gw.go"
 
-  sed -i -E "s#package $pkg#package gw#g" "${gwfile}"
-  sed -i -E "s#import \(#import \(\"go.etcd.io/etcd/${pkgpath}\"#g" "${gwfile}"
-  sed -i -E "s#([ (])([a-zA-Z0-9_]*(Client|Server|Request)([^(]|$))#\1${pkg}.\2#g" "${gwfile}"
-  sed -i -E "s# (New[a-zA-Z0-9_]*Client\()# ${pkg}.\1#g" "${gwfile}"
-  sed -i -E "s|go.etcd.io/etcd|go.etcd.io/etcd/v3|g" "${gwfile}"
-  sed -i -E "s|go.etcd.io/etcd/v3/api|go.etcd.io/etcd/api/v3|g" "${gwfile}"
-  sed -i -E "s|go.etcd.io/etcd/v3/server|go.etcd.io/etcd/server/v3|g" "${gwfile}"
-  
+  sed -i '' -E "s#package $pkg#package gw#g" "${gwfile}"
+  sed -i '' -E "s#import \(#import \(\"go.etcd.io/etcd/${pkgpath}\"#g" "${gwfile}"
+  sed -i '' -E "s#([ (])([a-zA-Z0-9_]*(Client|Server|Request)([^(]|$))#\1${pkg}.\2#g" "${gwfile}"
+  sed -i '' -E "s# (New[a-zA-Z0-9_]*Client\()# ${pkg}.\1#g" "${gwfile}"
+  sed -i '' -E "s|go.etcd.io/etcd|go.etcd.io/etcd/v3|g" "${gwfile}"
+  sed -i '' -E "s|go.etcd.io/etcd/v3/api|go.etcd.io/etcd/api/v3|g" "${gwfile}"
+  sed -i '' -E "s|go.etcd.io/etcd/v3/server|go.etcd.io/etcd/server/v3|g" "${gwfile}"
+
   run go fmt "${gwfile}"
 
   gwdir="${pkgpath}/gw/"
@@ -113,3 +113,12 @@ else
 fi
 
 log_success -e "\n./genproto SUCCESS"
+
+
+
+# Resolved binary and packages versions:
+#   - protoc-gen-gofast:       /Users/dhermes/go/src/go.etcd.io/etcd/tools/mod/.gobincache/github.com/gogo/protobuf/@v/v1.3.1/protoc-gen-gofast/protoc-gen-gofast
+#   - protoc-gen-grpc-gateway: /Users/dhermes/go/src/go.etcd.io/etcd/tools/mod/.gobincache/github.com/grpc-ecosystem/grpc-gateway/@v/v1.14.6/protoc-gen-grpc-gateway/protoc-gen-grpc-gateway
+#   - swagger:                 /Users/dhermes/go/src/go.etcd.io/etcd/tools/mod/.gobincache/github.com/grpc-ecosystem/grpc-gateway/@v/v1.14.6/protoc-gen-swagger/protoc-gen-swagger
+#   - gogoproto-root:          /Users/dhermes/go/pkg/mod/github.com/gogo/protobuf@v1.3.1/proto/..
+#   - grpc-gateway-root:       /Users/dhermes/go/pkg/mod/github.com/grpc-ecosystem/grpc-gateway@v1.14.6/protoc-gen-grpc-gateway/..
