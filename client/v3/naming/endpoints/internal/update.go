@@ -36,3 +36,5 @@ type Update struct {
 	// Since etcd 3.1.
 	Metadata interface{}
 }
+
+type Watcher interface{}

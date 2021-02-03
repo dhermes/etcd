@@ -33,9 +33,9 @@ import (
 )
 
 // NOTE: Ensure
-//       - `baseBalancer` satisfies `balancer.V2Balancer`.
+//       - `baseBalancer` satisfies `balancer.Balancer`.
 var (
-	_ balancer.V2Balancer = (*baseBalancer)(nil)
+	_ balancer.Balancer = (*baseBalancer)(nil)
 )
 
 // Config defines balancer configurations.
@@ -145,12 +145,12 @@ type baseBalancer struct {
 	picker picker.Picker
 }
 
-// UpdateClientConnState implements "grpc/balancer.V2Balancer" interface.
+// UpdateClientConnState implements "grpc/balancer.Balancer" interface.
 func (bb *baseBalancer) UpdateClientConnState(ccs balancer.ClientConnState) error {
 	return bb.handleResolvedWithError(ccs.ResolverState.Addresses, nil)
 }
 
-// ResolverError implements "grpc/balancer.V2Balancer" interface.
+// ResolverError implements "grpc/balancer.Balancer" interface.
 func (bb *baseBalancer) ResolverError(err error) {
 	bb.HandleResolvedAddrs(nil, err)
 }
@@ -163,7 +163,7 @@ func (bb *baseBalancer) HandleResolvedAddrs(addrs []resolver.Address, err error)
 
 // handleResolvedWithError is an implementation shared both by `HandleResolvedAddrs()`,
 // which is part of the `Balancer` interface as well as `UpdateClientConnState()`,
-// which is part of the `V2Balancer` interface.
+// which is part of the `Balancer` interface.
 func (bb *baseBalancer) handleResolvedWithError(addrs []resolver.Address, err error) error {
 	if err != nil {
 		bb.lg.Warn("HandleResolvedAddrs called with error", zap.String("balancer-id", bb.id), zap.Error(err))
@@ -223,7 +223,7 @@ func (bb *baseBalancer) handleResolvedWithError(addrs []resolver.Address, err er
 	return multierr.Combine(warnedErrors...)
 }
 
-// UpdateSubConnState implements "grpc/balancer.V2Balancer" interface.
+// UpdateSubConnState implements "grpc/balancer.Balancer" interface.
 func (bb *baseBalancer) UpdateSubConnState(sc balancer.SubConn, s balancer.SubConnState) {
 	bb.HandleSubConnStateChange(sc, s.ConnectivityState)
 }
@@ -282,7 +282,11 @@ func (bb *baseBalancer) HandleSubConnStateChange(sc balancer.SubConn, s grpcconn
 		bb.updatePicker()
 	}
 
-	bb.currentConn.UpdateBalancerState(bb.connectivityRecorder.GetCurrentState(), bb.picker)
+	state := balancer.State{
+		ConnectivityState: bb.connectivityRecorder.GetCurrentState(),
+		Picker:            bb.picker,
+	}
+	bb.currentConn.UpdateState(state)
 }
 
 func (bb *baseBalancer) updatePicker() {

@@ -15,7 +15,6 @@
 package picker
 
 import (
-	"context"
 	"sync"
 
 	"go.uber.org/zap"
@@ -25,9 +24,9 @@ import (
 )
 
 // NOTE: Ensure
-//       - `rrBalancedV2` satisfies `balancer.V2Picker`.
+//       - `rrBalanced` satisfies `balancer.Picker`.
 var (
-	_ balancer.V2Picker = (*rrBalancedV2)(nil)
+	_ balancer.Picker = (*rrBalanced)(nil)
 )
 
 // newRoundrobinBalanced returns a new roundrobin balanced picker.
@@ -58,12 +57,12 @@ type rrBalanced struct {
 func (rb *rrBalanced) String() string { return rb.p.String() }
 
 // Pick is called for every client request.
-func (rb *rrBalanced) Pick(_ context.Context, opts balancer.PickInfo) (balancer.SubConn, func(balancer.DoneInfo), error) {
+func (rb *rrBalanced) Pick(opts balancer.PickInfo) (balancer.PickResult, error) {
 	rb.mu.RLock()
 	n := len(rb.scs)
 	rb.mu.RUnlock()
 	if n == 0 {
-		return nil, nil, balancer.ErrNoSubConnAvailable
+		return balancer.PickResult{}, balancer.ErrNoSubConnAvailable
 	}
 
 	rb.mu.Lock()
@@ -97,15 +96,7 @@ func (rb *rrBalanced) Pick(_ context.Context, opts balancer.PickInfo) (balancer.
 			rb.lg.Warn("balancer failed", fss...)
 		}
 	}
-	return sc, doneFunc, nil
-}
 
-type rrBalancedV2 struct {
-	rrBalanced
-}
-
-func (rb2 *rrBalancedV2) Pick(opts balancer.PickInfo) (balancer.PickResult, error) {
-	sc, doneFunc, err := rb2.rrBalanced.Pick(context.TODO(), opts)
 	pr := balancer.PickResult{SubConn: sc, Done: doneFunc}
-	return pr, err
+	return pr, nil
 }
